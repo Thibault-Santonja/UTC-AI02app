@@ -176,7 +176,7 @@ CG-USER:(transf Z)
 ;(equal (allies (car basetest)) '("Royaume Franc"))
 (defun FB2 (expr)
 	(cons
-		(if	(equal (allies (car expr)) '("Royaume Franc")) (nomConflit (car expr)))
+		(if	(equal (allies (car expr)) '("Royaume Franc")) (nomConflit (car expr)) '())
 		(if (not (null (cdr expr))) (FB2 (cdr expr)))
 	)
 )
@@ -208,8 +208,9 @@ CG-USER:(transf Z)
 		(if (OR (equal (allies (car expr)) participant)
 				(equal (ennemis (car expr)) participant)
 			)
-			(nomConflit (car expr)))
-		(if (not (null (cdr expr))) (FB3 (cdr expr) participant))
+			(nomConflit (car expr))
+			'())
+		(if (not (null (cdr expr))) (FB3 (cdr expr) participant) '())
 	)
 )
 
@@ -251,7 +252,8 @@ CG-USER:(transf Z)
 		(if (AND (> (dateDebut (car expr)) 523)
 				 (< (dateDebut (car expr)) 715)
 			) 
-			(nomConflit (car expr)))
+			(nomConflit (car expr))
+			'())
 		(if (not (null (cdr expr))) (FB5 (cdr expr)))
 	)
 )
@@ -266,16 +268,37 @@ CG-USER:(transf Z)
 
 
 
+;;;;;;;;;;;;OK;;;;;;;;;;;;;;;;;;;
 
 
-(defun FB6 (expr)
+;(or
+;(equal (allies (car basetest)) '("Lombards"))
+;(equal (ennemis (car basetest)) '("Lombards")))
+
+
+(defun FB6_test (expr)
 	(cond
-		(OR (equal (allies (car expr)) '("Lombards"))
-			(equal (ennemis (car expr)) '("Lombards"))
-		) (+ 1 (FB6 (cdr expr)))
-		(not (null (cdr expr))) (FB6 (cdr expr))
+		((equal (allies (car expr)) '("Lombards")) 1)
+		((equal (ennemis (car expr)) '("Lombards")) 1)
+		(T 0)
 	)
 )
+
+(defun FB6 (expr)
+  (if (null  expr)
+      (FB6_test expr)
+      (+ (FB6_test expr)
+         (FB6 (cdr expr)))
+   )
+)
+
+
+
+
+
+
+
+
 
 
 
