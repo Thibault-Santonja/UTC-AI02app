@@ -401,3 +401,224 @@ CG-USER:(transf Z)
 		expr
 	)
 )
+
+
+
+
+
+;AI02_TP1_SANTONJA
+
+(defun affiche (expr)
+	(cons
+		(car expr)
+		(if (not (null (cdr expr))) (affiche (cdr expr)))
+	)
+)
+
+(defun affiche1 (expr)
+	(if x 
+		(progn (print (car x))
+		(print1 (cdr x)))
+	)
+)
+
+;(defun affiche2 (expr)
+;	(mapcar #'(lambda (y) )
+;)
+
+(defun affiche3 (expr)
+	(cond
+		((null expr) nil)
+		(T (print (car expr)) (print3 (cdr expr)))
+	)
+)
+
+(defun print4 (x)
+	(dolist (y x "fin") (print y))
+)
+
+(defun print5 (expr)
+	(format "~{~&~S ~}" expr)
+)
+
+
+
+; => tester avec un Loop, formet
+
+
+(setq ll
+	'(html 	(header (title "ma page")) 
+			(body 	(h1 "un titre")
+					(p "soror et aemula Romae")
+			)		
+	)
+)
+
+
+
+
+(defun baliseDeb (expr)
+	(concatenate 'string "<" (string expr) ">")
+)
+(defun baliseFin (expr)
+	(concatenate 'string "</" (string expr) ">")
+)
+
+(defun baliseDeb (expr)
+(with-open-file (str "D:/index.html"
+                     :direction :output
+                     :if-exists :supersede
+                     :if-does-not-exist :create)
+  (format str (concatenate 'string "<" (string expr) ">")))
+)
+(defun baliseFin (expr)
+(with-open-file (str "D:/index.html"
+                     :direction :output
+                     :if-exists :supersede
+                     :if-does-not-exist :create)
+  (format str (concatenate 'string "</" (string expr) ">")))
+)
+
+(defun make_html (expr)
+	(if (listp (car expr)) (make_html (car expr)) (print (baliseDeb (car expr))))
+	(if (not (null (cdr expr))) 
+		(if (stringp (cdr expr)) 
+			(print (cdr expr)) 
+			(make_html (cdr expr)) 
+		)
+	)
+	(if (not (listp (car expr))) 
+		(print (baliseFin (car expr)))
+	)
+)
+
+
+
+
+
+(with-open-file (str "D:/index.html"
+                     :direction :output
+                     :if-exists :overwrite
+                     :if-does-not-exist :create)
+  (format str (make-html ll))
+)
+
+;(with-open-file (str "D:/filename.txt"
+;                     :direction :output
+;                     :if-exists :supersede
+;                     :if-does-not-exist :create)
+;  (format str "write anything ~%")
+;)
+
+; si le premier element n'est pas une liste l'afficher (car c'est la balise)
+; sinon faire appel à make_html
+
+; si il y a un cdr -> si le cdr est un texte afficher le cdr 
+;						sinon faire appel à make_html
+
+; si le premier élément n'est pas une list (c'est donc une balise) -> fermer la balise
+
+
+
+
+(defun make-html (l)
+    (format t (concatenate 'string "<" (string (car l)) ">"))
+    (dolist (elem (cdr l)) 
+        (if (listp elem) 
+            (make-html elem) 
+            (format t elem)
+        )
+    )
+    (format t (concatenate 'string "</" (string (car l)) ">"))
+)
+
+
+;(defun make-html (l)
+;    (format t (deb l))
+;    (dolist (elem (cdr l)) 
+;        (if (listp elem) 
+;            (make-html elem) 
+;            (format t (ecrire l))
+;        )
+;    )
+;    (format t (fin l))
+;)
+
+;(defun ecrire (l)
+;	(with-open-file (str "D:/index.html"
+;	                     :direction :output
+;	                     :if-does-not-exist :create)
+;	  (format str l)
+;	)
+;)
+
+;(defun deb (l)
+;	(with-open-file (str "D:/index.html"
+;                     :direction :output
+;                     :if-does-not-exist :create)
+;  (format str (concatenate 'string "<" (string (car l)) ">")))
+;)
+
+;(defun fin (l)
+;		(with-open-file (str "D:/index.html"
+;                     :direction :output
+;                     :if-does-not-exist :create)
+;  (format str (concatenate 'string "</" (string (car l)) ">")))
+;)
+
+
+
+
+(with-open-file (str "D:/index.html"
+                     :direction :output
+                     :if-exists :overwrite
+                     :if-does-not-exist :create)
+  (format str "write anything ~%")
+)
+
+
+(with-open-file (str "D:/index.html"
+                     :direction :output
+                     :if-exists :overwrite
+                     :if-does-not-exist :create)
+  (format str (make-html ll))
+)
+
+
+
+
+
+
+
+
+(defun make-html (l)
+    (format t (write (concatenate 'string "<" (string (car l)) ">") :stream file))
+    (dolist (elem (cdr l)) 
+        (if (listp elem) 
+            (make-html elem) 
+            (format t (write elem :stream file))
+        )
+    )
+    (format t (write (concatenate 'string "</" (string (car l)) ">") :stream file))
+)
+
+(setq file (open "D:/index.html" 
+			:if-does-not-exist :create 
+			:direction : output
+			:if-exists : overwrite
+			)
+)
+
+
+
+(load "D:/index.html")
+
+
+
+(write (make-html ll) :stream file)
+
+
+
+(close file)
+
+

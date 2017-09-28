@@ -92,7 +92,7 @@
 	)
 )
 
-(car (cdr '("Guerre de Burgondie" 523 533 ("Royaume Franc") ("Burgondes")("Royaume de Bourgogne")) ))
+
 (defun dateDebut (expr)
 		(car (cdr expr))
 )
@@ -114,88 +114,31 @@
 		(car (cdr (cdr (cdr (cdr (cdr expr))))))
 )
 
-;(defun FB1 (expr)	;nom de la dernière liste de la liste
-;		(if (not (null (cdr expr))) 
-;			(FB1 (cdr expr))
-;			(NOMCONFLIT (car expr))
-;		)
-;)
 
-
-;;;;;;;;;;;;;;;OK;;;;;;;;;;;;;;;
 (defun FB1 (expr)
-	(cons
-		(NOMCONFLIT (car expr))
-		(if (not (null (cdr expr)))
+	(write	(NOMCONFLIT (car expr)))
+	(if (not (null (cdr expr)))
 			(FB1 (cdr expr))
-		)
 	)
 )
 
-(fb1 basetest)
-
-
-
-
-
-
-
-;;;;;;;;;;;;;;;PB "NIL";;;;;;;;;;;;;;;;;;;;;;;;;
-;(equal (allies (car basetest)) '("Royaume Franc"))
 (defun FB2 (expr)
-	(cons
-		(if	(equal (allies (car expr)) '("Royaume Franc")) (nomConflit (car expr)) '())
-		(if (not (null (cdr expr))) (FB2 (cdr expr)))
-	)
+	(if	(equal (allies (car expr)) '("Royaume Franc")) (write (nomConflit (car expr))))
+	(if (not (null (cdr expr))) (FB2 (cdr expr)))
 )
-
-(fb2 basetest)
-
-
-
-
-
-
-
-
-
-;(defun FB3 (expr participant)
-;	(cond
-;		(OR (equal (allies (car expr)) participant)
-;			(equal (ennemis (car expr)) participant)
-;		)(nomConflit (car expr))
-;		(not (null (cdr expr))) (FB3 (cdr expr) participant)
-;	)
-;)
-
-
-;;;;;;;;;;;;;;;PB "NIL";;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun FB3 (expr participant)
-	(cons
-		(if (OR (equal (allies (car expr)) participant)
-				(equal (ennemis (car expr)) participant)
-			)
-			(nomConflit (car expr))
-			'())
-		(if (not (null (cdr expr))) (FB3 (cdr expr) participant) '())
+	(if (OR (equal (allies (car expr)) participant)
+			(equal (ennemis (car expr)) participant)
+		)
+		(write (nomConflit (car expr)))
 	)
+	(if (not (null (cdr expr))) (FB3 (cdr expr) participant) '())
 )
 
 (fb3 basetest '("Thuringes"))
 
 
-
-
-
-
-
-
-
-
-
-
-;;;;;;;;;;;;OK;;;;;;;;;;;;;;;;;;;
 (defun FB4 (expr)
 	(if
 		(= (dateDebut (car expr)) 523) (nomConflit (car expr))
@@ -203,53 +146,13 @@
 	)
 )
 
-
-
-
-
-
-
-
-
-
-;;;;;;;;;;;;;;;PB "NIL";;;;;;;;;;;;;;;;;;;;;;;;;
-
-
 (defun FB5 (expr)
-	(cons
-		(if (AND (> (dateDebut (car expr)) 523)
-				 (< (dateDebut (car expr)) 715)
-			) 
-			(nomConflit (car expr))
-			'())
-		(if (not (null (cdr expr))) (FB5 (cdr expr)))
+	(if (AND (> (dateDebut (car expr)) 523)
+			 (< (dateDebut (car expr)) 715)
+		) 
+		(write (nomConflit (car expr)))
 	)
-)
-
-
-
-
-
-
-
-
-
-
-
-;;;;;;;;;;;;OK;;;;;;;;;;;;;;;;;;;
-
-
-;(or
-;(equal (allies (car basetest)) '("Lombards"))
-;(equal (ennemis (car basetest)) '("Lombards")))
-
-
-(defun FB6_test (expr)
-	(cond
-		((equal (allies (car expr)) '("Lombards")) 1)
-		((equal (ennemis (car expr)) '("Lombards")) 1)
-		(T 0)
-	)
+	(if (not (null (cdr expr))) (FB5 (cdr expr)))
 )
 
 (defun FB6 (expr)
