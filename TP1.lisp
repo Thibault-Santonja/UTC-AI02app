@@ -1,6 +1,38 @@
+; 2017-09-14
+; TP - 1 LISP
+; Santonja Thibault
+
+
+
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  TP 1  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  TD 1  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+CG-USER:(defun transf(expr) (if 	(listp expr)
+							(list 	(cadr expr)
+									(transf (car expr))
+									(transf (caddr expr))
+							)
+							expr
+					)
+)
+TRANSF
+
+CG-USER:(setq Z '((x + 5) / ((x + 2) + (x * 2))))
+((X + 5) / ((X + 2) + (X * 2)))
+
+CG-USER:(transf Z)
+(/ (+ X 5) (+ (+ X 2) (* X 2)))
+
+
+
+
+
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;  EXERCICE 1  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -92,7 +124,7 @@
 	)
 )
 
-
+(car (cdr '("Guerre de Burgondie" 523 533 ("Royaume Franc") ("Burgondes")("Royaume de Bourgogne")) ))
 (defun dateDebut (expr)
 		(car (cdr expr))
 )
@@ -114,51 +146,148 @@
 		(car (cdr (cdr (cdr (cdr (cdr expr))))))
 )
 
-
 (defun FB1 (expr)
-	(write	(NOMCONFLIT (car expr)))
-	(if (not (null (cdr expr)))
-			(FB1 (cdr expr))
-	)
+		(cond
+		 (not (null (cdr expr))) (FB1 (cdr expr))
+		 (T) (NOMCONFLIT (car expr))
+		)
 )
 
 (defun FB2 (expr)
-	(if	(equal (allies (car expr)) '("Royaume Franc")) (write (nomConflit (car expr))))
-	(if (not (null (cdr expr))) (FB2 (cdr expr)))
+	(cond
+		(= (allies (car expr)) '"Royaume Franc")(nomConflit (car expr))
+		(not (null (cdr expr))) (FB2 (cdr expr))
+	)
 )
 
 (defun FB3 (expr participant)
-	(if (OR (equal (allies (car expr)) participant)
-			(equal (ennemis (car expr)) participant)
-		)
-		(write (nomConflit (car expr)))
+	(cond
+		(OR (= (allies (car expr)) participant)
+			(= (ennemis (car expr)) participant)
+		)(nomConflit (car expr))
+		(not (null (cdr expr))) (FB3 (cdr expr) participant)
 	)
-	(if (not (null (cdr expr))) (FB3 (cdr expr) participant) '())
 )
 
-(fb3 basetest '("Thuringes"))
-
-
 (defun FB4 (expr)
-	(if
-		(= (dateDebut (car expr)) 523) (nomConflit (car expr))
-		(if (not (null (cdr expr))) (FB4 (cdr expr)))
+	(cond
+		(= (dateDebut (car expr)) 523)(nomConflit (car expr))
+		(not (null (cdr expr))) (FB4 (cdr expr))
 	)
 )
 
 (defun FB5 (expr)
-	(if (AND (> (dateDebut (car expr)) 523)
+	(cond
+		(AND (> (dateDebut (car expr)) 523)
 			 (< (dateDebut (car expr)) 715)
-		) 
-		(write (nomConflit (car expr)))
+		)(nomConflit (car expr))
+		(not (null (cdr expr))) (FB5 (cdr expr))
 	)
-	(if (not (null (cdr expr))) (FB5 (cdr expr)))
 )
 
 (defun FB6 (expr)
-  (if (null  expr)
-      (FB6_test expr)
-      (+ (FB6_test expr)
-         (FB6 (cdr expr)))
-   )
+	(cond
+		(OR (= (allies (car expr)) '"Lombards")
+			(= (ennemis (car expr)) '"Lombards")
+		)(+ 1 (FB6 (cdr expr)))
+		(not (null (cdr expr))) (FB6 (cdr expr))
+	)
+)
+
+
+
+
+
+
+
+
+;TD2
+
+
+(defun simp (expr)
+	(if (listp expr)
+		(let ( 	(op (car expr))
+				(u (simp (cadr expr)))
+				(v (simp (caddr expr)))
+			)
+			(cond
+				((and (numberP u) (numberp v)) (eval expr))
+				((and (eq '+ op)(eql 0 u)) v)
+				((and (eq '+ op)(eql 0 v)) u)
+				((and (eq '* op)(eql 1 u)) v)
+				((and (eq '* op)(eql 1 v)) u)
+				((and (eq '* op)(or (eql 0 u) (eql 0 v))) 0)
+			)
+		)
+		expr
+	)
+)
+(defun deriv_all (expr var)
+		(
+			(if (listp expr) 
+				(cond ((eq (car ewpr) '+)
+						(list '+ (deriv_all (cadr expr) var)
+								(deriv_all (caddr expr) var)
+						)
+					)
+					(
+						(eq (car expr)
+							(list '+
+								(list '* (deriv_all (cadr exp) var)(caddr expr))
+								(list '* (cadr expr) (deriv_all (caddr expr) var))
+							)
+						)
+					)
+				)
+				(if (eq var expr) 1 0)
+			)
+		)
+)
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  TD 2  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun derivf (expr var)
+	(if (listp expr)
+		(list '+ 	(list '* (derivpf (cadr expr) var) (caddr expr))
+					(list '* (cadr expr) (derivpf (caddr expr) var))
+		(derivterme expr var)
+	)
+)
+
+
+(defun derivp (expr var)
+	(if (listp expr)
+		(list (car expr) (derivpf (cadr expr) var) (derivpf (caddr expr) var))
+		(derivterme expr var)
+	)
+)
+
+(defun derivpf (expr var)
+	(if (eq (car expr) +)
+		(derivp expr var)
+	)
+)
+
+(defun simp (expr)
+	(if (listp expr)
+		(let ( 	(op (car expr))
+				(u (simp (cadr expr)))
+				(v (simp (caddr expr)))
+			)
+			(cond
+				((and (numberP u) (numberp v)) (eval expr))
+				((and (eq '+ op)(eql 0 u)) v)
+				((and (eq '+ op)(eql 0 v)) u)
+				((and (eq '* op)(eql 1 u)) v)
+				((and (eq '* op)(eql 1 v)) u)
+				((and (eq '* op)(or (eql 0 u) (eql 0 v))) 0)
+			)
+		)
+		expr
+	)
 )

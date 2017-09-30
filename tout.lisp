@@ -11,7 +11,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  TD 1  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-CG-USER:(defun transf(expr) (if 	(listp expr)
+(defun transf(expr) (if 	(listp expr)
 							(list 	(cadr expr)
 									(transf (car expr))
 									(transf (caddr expr))
@@ -19,13 +19,10 @@ CG-USER:(defun transf(expr) (if 	(listp expr)
 							expr
 					)
 )
-TRANSF
 
-CG-USER:(setq Z '((x + 5) / ((x + 2) + (x * 2))))
-((X + 5) / ((X + 2) + (X * 2)))
+(setq Z '((x + 5) / ((x + 2) + (x * 2))))
 
-CG-USER:(transf Z)
-(/ (+ X 5) (+ (+ X 2) (* X 2)))
+(transf Z)
 
 
 
@@ -592,14 +589,14 @@ CG-USER:(transf Z)
 
 
 (defun make-html (l)
-    (format t (write (concatenate 'string "<" (string (car l)) ">") :stream file))
+    (write (format t (concatenate 'string "<" (string (car l)) ">"))  :stream file)
     (dolist (elem (cdr l)) 
         (if (listp elem) 
             (make-html elem) 
-            (format t (write elem :stream file))
+             (write (format t elem) :stream file)
         )
     )
-    (format t (write (concatenate 'string "</" (string (car l)) ">") :stream file))
+     (write (format t (concatenate 'string "</" (string (car l)) ">")) :stream file)
 )
 
 (setq file (open "D:/index.html" 
@@ -621,4 +618,152 @@ CG-USER:(transf Z)
 
 (close file)
 
+
+;TD4
+;1
+Ensemble des actions possibles : aller en haut, en bas, à droite, à gauche (E-1 1-E 1-2 2-1 2-7 ... 20-S)
+État initial : entrée
+État final : sortie
+État solution : sortie
+
+;2
+('entree (1 
+			(2 
+				(7 
+					(8 
+						(9 
+							(10 
+								(15 
+									(16 
+										(17 
+											(18 
+												(19 
+													(20 
+														(13 'sortie)
+													)
+												)
+											)
+										)
+									) 
+								11 
+									(14 
+									12 
+										(5 
+											(4)
+										)
+									)
+								)
+							)
+						) 
+					6 
+						(3)
+					)
+				)
+			)
+		)
+)
+
+;3
+(faire l'arbre)
+
+;4
+en profondeur -> étude de chaques branches jusqu'au bout
+en largeur -> étude par hauteur de l'arbre (toutes la possibilitées hauteur 1, puis toutes celles à la hauteur 2 ...)
+
+(defun parcours_profondeur (expr)
+	(dolist (elem expr) 
+        (if (listp elem) 
+            (parcours_profondeur elem)
+         	(if (eql expr '"sortie")
+         		(write 'BRAVO)
+         	)
+        )
+    )
+)
+
+;avec une autre représentation de la liste :
+
+(setq lab '(
+	(E 1) (1 E 2) (2 1 7) 
+	(3 6) (4 5) (5 4 12) 
+	(6 3 7) (7 2 6 8) (8 7 9)
+	(9 8 10) (10 9 11 15)
+	(11 10 12 14) (12 5 11)
+	(13 20) (14 11) (15 10 16)
+	(16 15 17) (17 16 18)
+	(18 17 19) (19 18 20) 
+	(20 13 19 S)
+	)
+) 
+
+(defun successeur (etat labyrinthe)
+	(cdr (assoc etat labyrinthe))
+)
+
+;5
+
+(defun explore (state old-state graph)
+	(print (list 'state state))
+	(read-char)
+	(cond
+		((null state) nil)
+		((eql state 'S) "sortie")
+		((explore (get-new-state state old-state graph)
+			(cons state old-state))	)
+		(t (backtrack state old-states graph))
+	)
+)
+
+(defun backtrack (state old-state graph)
+	(let (candidate)
+		(cond
+			((null state) nil)
+			((setq candidate (cadr (member state (successors (car old-state) graph) ) ) )
+				(explore candidate old-state)
+			)
+			(t (backtrack (car old-state) (cdr old-state) graph))
+		)
+	)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;; SOLUTION FINALE ;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq l_res ())
+
+(setq l_explore ())
+
+(setq lab '(
+	(E 1) (1 E 2) (2 1 7) 
+	(3 6) (4 5) (5 4 12) 
+	(6 3 7) (7 2 6 8) (8 7 9)
+	(9 8 10) (10 9 11 15)
+	(11 10 12 14) (12 5 11)
+	(13 20) (14 11) (15 10 16)
+	(16 15 17) (17 16 18)
+	(18 17 19) (19 18 20) 
+	(20 13 19 S)
+	)
+)
+
+
+(defun explore (expr)
+	(if (eq expr 'S)
+		(push expr l_res)
+		(progn
+			(push expr l_explore)
+			(dolist (succ (cdr (assoc expr lab)))
+				(if (not (member succ l_explore))
+					(explore succ)
+				)
+				(if (member succ l_res)
+						(push expr l_res)
+				)
+			)
+		)
+	)
+	(if (eq expr 'E)
+		(print l_res))
+)
 
